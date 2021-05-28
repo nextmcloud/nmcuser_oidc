@@ -24,11 +24,11 @@ declare(strict_types=1);
  */
 
 return [
-	return [
-		'resources' => [
-			'nmcuser' => ['url' => '/nmcuser/{$providername}']
-		],
-		'routes' => [
-		    ['name' => 'nmcuser#token', 'url' => '/token/{$id}', 'verb' => 'GET'],
-    	]
-    ];
+	'resources' => [
+		'nmcuser' => ['url' => '/nmcuser/{$providername}']
+	],
+	'routes' => [
+	    ['name' => 'NmcUserApi#token', 'url' => '/token/{$id}', 'verb' => 'GET'],
+		['name' => 'NmcUserApi#create', 'url' => '/create', 'verb' => 'POST'],
+   	]
+];
