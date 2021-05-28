@@ -1,4 +1,4 @@
 <?php
-namespace namespace OCA\NextMagentaCloud\User\Service;
+namespace OCA\NextMagentaCloud\User\Service;
 
 class NotFoundException extends ServiceException {}

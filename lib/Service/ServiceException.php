@@ -1,5 +1,5 @@
 <?php
-namespace namespace OCA\NextMagentaCloud\User\Service;
+namespace OCA\NextMagentaCloud\User\Service;
 
 use Exception;
 

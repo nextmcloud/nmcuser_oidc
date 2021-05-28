@@ -35,7 +35,7 @@ class NmcUserService {
      * Find OpenId connect provider id case-insensitive by name.
      * Otherwise, assume that the given parameter is already the id 
      */
-    public findProviderByIdentifier(string $providerNameOrId) {
+    public function findProviderByIdentifier(string $providerNameOrId) {
         $providers = $this->oidcProviderMapper->getProviders();
         foreach ($providers as $provider) {
             if (strcasecmp($provider->identifier, $providerNameOrId) == 0) {
@@ -50,7 +50,7 @@ class NmcUserService {
      * Imitate zhe userID computation from oidc app
      * id4me is not used/supported yet.
      */
-    protected computeUserId(string $providerId, string $username, bool $id4me = false) {
+    protected function computeUserId(string $providerId, string $username, bool $id4me = false) {
 		if ($id4me) {
 			return hash('sha256', $providerId . '_1_' . $username);
 		} else {
@@ -90,8 +90,8 @@ class NmcUserService {
                         bool $enabled = true) {
         $providerId = $this->findProviderByIdentifier($providername);
         $oidcUserId = $this->computeUserId($providerId, $username);
-        if ($this->oidcUserMapper->userExists($oidcUserId) {
-            throw new UserExistException("OpenID user " . $username . "," . $oidcUserId . " already exists!")
+        if ($this->oidcUserMapper->userExists($oidcUserId)) {
+            throw new UserExistException("OpenID user " . $username . "," . $oidcUserId . " already exists!");
         }
         
         $oidcUser = $this->oidcUserMapper->getOrCreate($providerId, $username);
@@ -107,11 +107,11 @@ class NmcUserService {
                         string $displayName, 
                         string $email, 
                         int $quota,
-                        bool enabled = true) {
+                        bool $enabled = true) {
         $providerId = $this->findProviderByIdentifier($providername);
         $oidcUserId = $this->computeUserId($providerId, $username);
-        if (!$this->oidcUserMapper->userExists($oidcUserId) {
-            throw new UserExistException("OpenID user " . $username . "," . $oidcUserId . " does not exist!")
+        if (!$this->oidcUserMapper->userExists($oidcUserId)) {
+            throw new UserExistException("OpenID user " . $username . "," . $oidcUserId . " does not exist!");
         }
                             
         $oidcUser = $this->oidcUserMapper->getOrCreate($providerId, $username);
