@@ -14,15 +14,11 @@ class NmcUserApiController extends ApiController {
 
     private $service;
 
-    private $userId;
-
     public function __construct($appName, 
                                 IRequest $request,
-                                NmcUserService $service,
-                                string $userId){
+                                NmcUserService $service){
         parent::__construct($appName, $request);
         $this->service = $service;
-        $this->userId = $userId;
     }
 
     /**
@@ -42,9 +38,12 @@ class NmcUserApiController extends ApiController {
      * @CORS
      * @NoCSRFRequired
      * @AdminRequired
+     *
+     * @param string $providername
+     * @param string $username
      */
-    public function index($id) {
-        return new DataResponse($this->service->findAll($id, $this->userId));
+    public function index($providername, $username) {
+        return new DataResponse($this->service->findAll($providername, $username));
     }
 
     /**
@@ -52,11 +51,12 @@ class NmcUserApiController extends ApiController {
      * @NoCSRFRequired
      * @AdminRequired
      *
-     * @param int $id
+     * @param string $providername
+     * @param string $username
      */
-    public function show($id) {
-        return $this->handleNotFound(function () use ($id) {
-            return $this->service->find($id, $this->userId);
+    public function show($providername, $username) {
+        return $this->handleNotFound(function () use ($providername, $username) {
+            return $this->service->find($providername, $username);
         });
     }
 
@@ -65,16 +65,20 @@ class NmcUserApiController extends ApiController {
      * @NoCSRFRequired
      * @AdminRequired
      *
-     * @param string $title
-     * @param string $content
+     * @param string $providername
+     * @param string $username
+     * @param string $displayname
+     * @param string $email
+     * @param int $quota
+     * @param bool $enabled
      */
     public function create(string $providername,
                         string $username,
-                        string $displayName, 
+                        string $displayname,
                         string $email, 
                         int $quota,
                         bool $enabled = true) {
-        return $this->service->create($providername, $username, $displayName, $email, $quota, $enabled);
+        return $this->service->create($providername, $username, $displayname, $email, $quota, $enabled);
     }
 
     /**
@@ -82,9 +86,12 @@ class NmcUserApiController extends ApiController {
      * @NoCSRFRequired
      * @AdminRequired
      *
-     * @param int $id
-     * @param string $title
-     * @param string $content
+     * @param string $providername
+     * @param string $username
+     * @param string $displayName
+     * @param string $email
+     * @param int $quota
+     * @param bool $enabled
      */
     public function update(string $providername,
                         string $username,
@@ -102,13 +109,29 @@ class NmcUserApiController extends ApiController {
      * @NoCSRFRequired
      * @AdminRequired
      *
-     * @param int $id
+     * @param int $providername
+     * @param string $username
      */
-    public function destroy($id) {
-        return $this->handleNotFound(function () use ($id) {
-            return $this->service->delete($id);
+    public function destroy($providername, $username) {
+        return $this->handleNotFound(function () use ($providername, $username) {
+            return $this->service->delete($providername, $username);
         });
     }
+
+    /**
+     * @CORS
+     * @NoCSRFRequired
+     * @AdminRequired
+     *
+     * @param string $providername
+     * @param string $username
+     */
+    public function token($providername, $username) {
+        return $this->handleNotFound(function () use ($providername, $username) {
+            return $this->service->token($providername, $username);
+        });
+    }
+
 }
     /*
     string $providername,

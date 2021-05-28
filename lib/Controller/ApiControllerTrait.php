@@ -3,11 +3,11 @@
 namespace OCA\NextMagentaCloud\User\Controller;
 
 use Closure;
-
+use OCA\NextMagentaCloud\User\Service\NotFoundException;
+use OCA\NextMagentaCloud\User\Service\DoesNotExistException;
+use OCA\NextMagentaCloud\User\Service\MultipleObjectsReturnedException;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
-
-use OCA\NotesTutorial\Service\NotFoundException;
 
 
 trait ApiControllerTrait {

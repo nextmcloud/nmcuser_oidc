@@ -5,12 +5,16 @@ use Exception;
 
 use OCP\IUserManager;
 use OCP\IUser;
+use OCP\Security\ISecureRandom;
+use OC\Authentication\Token\IProvider;
+use OC\Authentication\Token\IToken;
 
 // classes from user_oidc app
 use OCA\UserOIDC\Db\UserMapper;
 use OCA\UserOIDC\Db\User;
 use OCA\UserOIDC\Db\ProviderMapper;
 use OCA\UserOIDC\Db\Provider;
+use RuntimeException;
 
 class NmcUserService {
 
@@ -23,12 +27,22 @@ class NmcUserService {
     /** @var ProviderMapper */
 	private $oidcUProviderMapper;
 
+    /** @var IProvider */
+	protected $tokenProvider;
+
+    /** @var ISecureRandom */
+	private $random;
+
     public function __construct(IUserManager $userManager,
                             UserMapper $oidcUserMapper,
-                            ProviderMapper $oidcProviderMapper){
+                            ProviderMapper $oidcProviderMapper,
+                            IProvider $tokenProvider,
+                            ISecureRandom $random){
         $this->userManager = $userManager;
         $this->oidcUserMapper = $oidcUserMapper;
         $this->oidcProviderMapper = $oidcProviderMapper;
+        $this->tokenProvider = $tokenProvider;
+        $this->random = $random;
     }
 
     /**
@@ -136,7 +150,31 @@ class NmcUserService {
         }
     }
 
-    public function token(string $userId) {
+    /**
+     * Generate app token
+     *
+     * @param string $providerid
+     * @param string $username
+     * @return string
+     * @throws RuntimeException
+     */
+    public function token(string $providerid, string $username) {
+        $oidcUserId = $this->computeUserId($providerid, $username);
+        $user = $this->userManager->get($oidcUserId);
+
+        $token = $this->random->generate(72, ISecureRandom::CHAR_UPPER.ISecureRandom::CHAR_LOWER.ISecureRandom::CHAR_DIGITS);
+		$this->tokenProvider->generateToken(
+			$token,
+			$user->getUID(),
+			$user->getDisplayName(),
+			'',
+			'cli',
+			IToken::PERMANENT_TOKEN,
+			IToken::DO_NOT_REMEMBER
+		);
+
+        return $token;
+
     }
 
 }
