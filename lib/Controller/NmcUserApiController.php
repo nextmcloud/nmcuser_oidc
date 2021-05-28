@@ -2,22 +2,24 @@
 namespace OCA\NextMagentaCloud\User\Controller;
 
 use Closure;
-
+use OCA\NextMagentaCloud\User\Service\NmcUserService;
+use OCA\NextMagentaCloud\User\Service\NotFoundException;
 use OCP\IRequest;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\ApiController;
 
-use OCA\NmcUserOidc\Service\NmcUserService;
-use OCA\NmcUserOidc\Service\NotFoundException;
 
 class NmcUserApiController extends ApiController {
 
     private $service;
 
+    private $userId;
+
     public function __construct($appName, 
                                 IRequest $request,
-                                NmcUserService $service){
+                                NmcUserService $service,
+                                string $userId){
         parent::__construct($appName, $request);
         $this->service = $service;
         $this->userId = $userId;
@@ -41,8 +43,8 @@ class NmcUserApiController extends ApiController {
      * @NoCSRFRequired
      * @AdminRequired
      */
-    public function index() {
-        return new DataResponse($this->service->findAll($this->userId));
+    public function index($id) {
+        return new DataResponse($this->service->findAll($id, $this->userId));
     }
 
     /**
@@ -71,8 +73,8 @@ class NmcUserApiController extends ApiController {
                         string $displayName, 
                         string $email, 
                         int $quota,
-                        bool enabled = true) {
-        return $this->service->create($title, $content);
+                        bool $enabled = true) {
+        return $this->service->create($providername, $username, $displayName, $email, $quota, $enabled);
     }
 
     /**
@@ -89,9 +91,9 @@ class NmcUserApiController extends ApiController {
                         string $displayName, 
                         string $email, 
                         int $quota,
-                        bool enabled = true) {
-        return $this->handleNotFound(function () use ($id, $title, $content) {
-            return $this->service->update($id, $title, $content;
+                        bool $enabled = true) {
+        return $this->handleNotFound(function () use ($providername, $username, $displayName, $email, $quota, $enabled) {
+            return $this->service->update($providername, $username, $displayName, $email, $quota, $enabled);
         });
     }
 
@@ -107,5 +109,12 @@ class NmcUserApiController extends ApiController {
             return $this->service->delete($id);
         });
     }
-
 }
+    /*
+    string $providername,
+    string $username,
+    string $displayName, 
+    string $email, 
+    int $quota,
+    bool $enabled = true
+    */
