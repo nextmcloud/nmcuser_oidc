@@ -28,7 +28,7 @@ return [
 		'nmcuser' => ['url' => '/nmcuser/{$providername}']
 	],
 	'routes' => [
-	    ['name' => 'NmcUserApi#token', 'url' => '/token/{$id}', 'verb' => 'GET'],
+	    ['name' => 'NmcUserApi#token', 'url' => '/token/{$providername}/{$username}', 'verb' => 'GET'],
 		['name' => 'NmcUserApi#create', 'url' => '/create', 'verb' => 'POST'],
-   	]
+	]
 ];
