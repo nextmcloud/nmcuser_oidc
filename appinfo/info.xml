@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-	<id>nmcloud_oidc</id>
+	<id>nmcuser_oidc</id>
 	<name>NextMagentaCloud OpenID Connect user management util</name>
 	<summary>Utility app for NextMagentaCloud to create OpenID connect users</summary>
 	<description>This utility app supports NextMagentaCloud migration to create OpenID users with file content before actual first login.</description>
 	<version>0.0.1</version>
 	<licence>agpl</licence>
 	<author>Bernd Rederlechner</author>
-	<namespace>NextMagentaCloudOIDC</namespace>
+	<namespace>NextMagentaCloud</namespace>
 	<types>
 		<authentication/>
 	</types>
