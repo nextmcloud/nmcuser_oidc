@@ -1,10 +1,8 @@
 <?php
-
-declare(strict_types=1);
 /**
- * @copyright Copyright (c) 2020, Roeland Jago Douma <roeland@famdouma.nl>
+ * @copyright 2018, Georg Ehrke <oc.list@georgehrke.com>
  *
- * @author Bernd Rederlechner <bernd.rederlechner@t-systems.com>
+ * @author Georg Ehrke <oc.list@georgehrke.com>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -23,12 +21,24 @@ declare(strict_types=1);
  *
  */
 
-return [
-	return [
-		'resources' => [
-			'nmcuser' => ['url' => '/nmcuser/{$providername}']
-		],
-		'routes' => [
-		    ['name' => 'nmcuser#token', 'url' => '/token/{$id}', 'verb' => 'GET'],
-    	]
-    ];
+namespace OCA\NextMagentaCloud\User\Test\Service;
+
+use Test\TestCase;
+
+use  OCA\NextMagentaCloud\User\Servic\NmcUserService;
+
+class NmcUserServiceTest extends TestCase {
+
+	/** @var NmcUserService */
+	private $userService;
+
+	protected function setUp(): void {
+		parent::setUp();
+
+        $this->userService = new NmcUserService();
+
+	}
+
+	public function testOidcUser() {
+	}
+}

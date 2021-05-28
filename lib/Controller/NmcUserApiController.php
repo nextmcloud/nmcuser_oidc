@@ -1,30 +1,45 @@
 <?php
 namespace OCA\NextMagentaCloud\User\Controller;
 
+use Closure;
+
 use OCP\IRequest;
+use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\ApiController;
 
 use OCA\NmcUserOidc\Service\NmcUserService;
+use OCA\NmcUserOidc\Service\NotFoundException;
 
 class NmcUserApiController extends ApiController {
-    use ApiControllerTrait;
 
     private $service;
-    private $userId;
 
     public function __construct($appName, 
                                 IRequest $request,
-                                NmcUserService $service, $userId){
+                                NmcUserService $service){
         parent::__construct($appName, $request);
         $this->service = $service;
         $this->userId = $userId;
     }
 
     /**
+     * Utility function for uniform http status handling in case of
+     * $id is not found
+     */
+    protected function handleNotFound (Closure $callback) {
+        try {
+            return new DataResponse($callback());
+        } catch(NotFoundException $e) {
+            $message = ['message' => $e->getMessage()];
+            return new DataResponse($message, Http::STATUS_NOT_FOUND);
+        }
+    }
+
+    /**
      * @CORS
      * @NoCSRFRequired
-     * @NoAdminRequired
+     * @AdminRequired
      */
     public function index() {
         return new DataResponse($this->service->findAll($this->userId));
@@ -33,7 +48,7 @@ class NmcUserApiController extends ApiController {
     /**
      * @CORS
      * @NoCSRFRequired
-     * @NoAdminRequired
+     * @AdminRequired
      *
      * @param int $id
      */
@@ -46,40 +61,50 @@ class NmcUserApiController extends ApiController {
     /**
      * @CORS
      * @NoCSRFRequired
-     * @NoAdminRequired
+     * @AdminRequired
      *
      * @param string $title
      * @param string $content
      */
-    public function create($title, $content) {
-        return $this->service->create($title, $content, $this->userId);
+    public function create(string $providername,
+                        string $username,
+                        string $displayName, 
+                        string $email, 
+                        int $quota,
+                        bool enabled = true) {
+        return $this->service->create($title, $content);
     }
 
     /**
      * @CORS
      * @NoCSRFRequired
-     * @NoAdminRequired
+     * @AdminRequired
      *
      * @param int $id
      * @param string $title
      * @param string $content
      */
-    public function update($id, $title, $content) {
+    public function update(string $providername,
+                        string $username,
+                        string $displayName, 
+                        string $email, 
+                        int $quota,
+                        bool enabled = true) {
         return $this->handleNotFound(function () use ($id, $title, $content) {
-            return $this->service->update($id, $title, $content, $this->userId);
+            return $this->service->update($id, $title, $content;
         });
     }
 
     /**
      * @CORS
      * @NoCSRFRequired
-     * @NoAdminRequired
+     * @AdminRequired
      *
      * @param int $id
      */
     public function destroy($id) {
         return $this->handleNotFound(function () use ($id) {
-            return $this->service->delete($id, $this->userId);
+            return $this->service->delete($id);
         });
     }
 
