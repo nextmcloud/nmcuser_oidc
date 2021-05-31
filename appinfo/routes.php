@@ -25,10 +25,10 @@ declare(strict_types=1);
 
 return [
 	'resources' => [
-		'nmcuser' => ['url' => '/nmcuser/{$providername}']
+		'nmcuser' => ['url' => '/api/1.0/nmcusers/{$providername}']
 	],
 	'routes' => [
-	    ['name' => 'NmcUserApi#token', 'url' => '/token/{$providername}/{$username}', 'verb' => 'GET'],
-		['name' => 'NmcUserApi#create', 'url' => '/create', 'verb' => 'POST'],
+		['name' => 'NmcUserApi#cors', 'url' => '/api/1.0/{path}', 'verb' => 'OPTIONS', 'requirements' => ['path' => '.+'] ],
+	    ['name' => 'NmcUserApi#token', 'url' => '/api/1.0//token/{$providername}/{$id}', 'verb' => 'GET'],
 	]
 ];
