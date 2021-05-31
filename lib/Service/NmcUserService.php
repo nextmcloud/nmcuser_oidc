@@ -79,7 +79,7 @@ class NmcUserService {
             $user = $this->userManager->get($oidcUserId);
             return [
                 'id'          => $user->getUID(),
-                'displayName' => $user->getDisplayName(),
+                'displayname' => $user->getDisplayName(),
                 'email'       => $user->getEmailAddress(),
                 'quota'       => $user->getQuota(),
                 'enabled'     => $user->isEnabled(),
@@ -98,7 +98,7 @@ class NmcUserService {
 
     public function create(string $providername,
                         string $username,
-                        string $displayName, 
+                        string $displayname, 
                         string $email, 
                         int $quota,
                         bool $enabled = true) {
@@ -109,16 +109,20 @@ class NmcUserService {
         }
         
         $oidcUser = $this->oidcUserMapper->getOrCreate($providerId, $username);
-        $oidcUser->setDisplayName($displayName);
+        $oidcUser->setDisplayName($displayname);
         $user = $this->userManager->get($oidcUser->getUserId());
         $user->setEMailAddress($email);
         $user->setQuota($quota);
         $user->setEnabled($enabled);
+
+        return [
+          'id' => $oidcUserId
+        ];
     }
 
     public function update(string $providername,
                         string $username,
-                        string $displayName, 
+                        string $displayname, 
                         string $email, 
                         int $quota,
                         bool $enabled = true) {
@@ -129,7 +133,7 @@ class NmcUserService {
         }
                             
         $oidcUser = $this->oidcUserMapper->getOrCreate($providerId, $username);
-        $oidcUser->setDisplayName($displayName);
+        $oidcUser->setDisplayName($displayname);
         $user = $this->userManager->get($oidcUser->getUserId());
         $user->setEMailAddress($email);
         $user->setQuota($quota);
@@ -173,8 +177,9 @@ class NmcUserService {
 			IToken::DO_NOT_REMEMBER
 		);
 
-        return $token;
-
+        return [
+            'token' => $token,
+        ];
     }
 
 }

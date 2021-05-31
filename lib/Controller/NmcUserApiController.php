@@ -35,6 +35,20 @@ class NmcUserApiController extends ApiController {
     }
 
     /**
+     * Utility function for uniform http status handling in case of
+     * $id is not found
+     */
+    protected function handleAlreadyExists (Closure $callback) {
+        try {
+            return new DataResponse($callback(), Http::STATUS_CREATED);
+        } catch(UserExistException $e) {
+            $message = ['message' => $e->getMessage()];
+            return new DataResponse($message, Http::STATUS_CONFLICT);
+        }
+    }
+
+
+    /**
      * @CORS
      * @NoCSRFRequired
      * @AdminRequired
@@ -42,8 +56,8 @@ class NmcUserApiController extends ApiController {
      * @param string $providername
      * @param string $username
      */
-    public function index($providername, $username) {
-        return new DataResponse($this->service->findAll($providername, $username));
+    public function index($providername, $id) {
+        return new DataResponse($this->service->findAll($providername, $id));
     }
 
     /**
@@ -54,9 +68,9 @@ class NmcUserApiController extends ApiController {
      * @param string $providername
      * @param string $username
      */
-    public function show($providername, $username) {
-        return $this->handleNotFound(function () use ($providername, $username) {
-            return $this->service->find($providername, $username);
+    public function show($providername, $id) {
+        return $this->handleNotFound(function () use ($providername, $id) {
+            return $this->service->find($providername, $id);
         });
     }
 
@@ -78,7 +92,9 @@ class NmcUserApiController extends ApiController {
                         string $email, 
                         int $quota,
                         bool $enabled = true) {
-        return $this->service->create($providername, $username, $displayname, $email, $quota, $enabled);
+        return $this->handleAlreadyExists(function () use ($providername, $id) {
+            return $this->service->create($providername, $username, $displayname, $email, $quota, $enabled);
+        });
     }
 
     /**
@@ -94,13 +110,13 @@ class NmcUserApiController extends ApiController {
      * @param bool $enabled
      */
     public function update(string $providername,
-                        string $username,
-                        string $displayName, 
+                        string $id,
+                        string $displayname, 
                         string $email, 
                         int $quota,
                         bool $enabled = true) {
-        return $this->handleNotFound(function () use ($providername, $username, $displayName, $email, $quota, $enabled) {
-            return $this->service->update($providername, $username, $displayName, $email, $quota, $enabled);
+        return $this->handleNotFound(function () use ($providername, $id, $displayname, $email, $quota, $enabled) {
+            return $this->service->update($providername, $id, $displayName, $email, $quota, $enabled);
         });
     }
 
@@ -112,9 +128,9 @@ class NmcUserApiController extends ApiController {
      * @param int $providername
      * @param string $username
      */
-    public function destroy($providername, $username) {
-        return $this->handleNotFound(function () use ($providername, $username) {
-            return $this->service->delete($providername, $username);
+    public function destroy($providername, $id) {
+        return $this->handleNotFound(function () use ($providername, $id) {
+            return $this->service->delete($providername, $id);
         });
     }
 
@@ -126,18 +142,8 @@ class NmcUserApiController extends ApiController {
      * @param string $providername
      * @param string $username
      */
-    public function token($providername, $username) {
-        return $this->handleNotFound(function () use ($providername, $username) {
-            return $this->service->token($providername, $username);
+    public function token($providername, $id) {
+        return $this->handleNotFound(function () use ($providername, $id) {
+            return $this->service->token($providername, $id);
         });
     }
-
-}
-    /*
-    string $providername,
-    string $username,
-    string $displayName, 
-    string $email, 
-    int $quota,
-    bool $enabled = true
-    */
