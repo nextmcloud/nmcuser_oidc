@@ -24,15 +24,16 @@ Create a new user with generic user_oidc username, email and quota.
 
 **Permissions required** : Admin
 
-### Example request : `POST /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider`
+### Example request 
+`POST /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider`
 
 ```json
 {
-    'username' : 'opattern',
-    'displayname' : 'Oliver Pattern',
-    'email' : 'primeolli@pattern.cloud', 
-    'quota' : 123456789,
-    'enabled' : false // optional parameter, default = true
+    "username" : "'opattern",
+    "displayname" : "Oliver Pattern",
+    "email" : "primeolli@pattern.cloud", 
+    "quota" : 123456789,
+    "enabled" : false // optional parameter, default = true
 }
 ```
 
@@ -41,7 +42,7 @@ Create a new user with generic user_oidc username, email and quota.
 
 ```json
 {
-    'id' : '0066786785671...<NextCLoud internal user hash>',
+    "id" : "0066786785671...<NextCLoud internal user hash>",
 }
 ```
 
@@ -64,18 +65,19 @@ Get the details for an username or id.
 
 **Permissions required** : Admin
 
-### Example request : `GET /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider/opattern`
+### Example request
+`GET /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider/opattern`
 
 ### Success Responses
 **Code** : `200 OK`
 
 ```json
 {
-    'id' : '0066786785671...<NextCLoud internal user hash>',
-    'displayname' : 'Oliver Pattern',
-    'email' : 'primeolli@pattern.cloud', 
-    'quota' : 123456789,
-    'enabled' : false // optional parameter, default = true
+    "id" : "0066786785671...<NextCLoud internal user hash>",
+    "displayname" : "Oliver Pattern",
+    "email" : "primeolli@pattern.cloud", 
+    "quota" : 123456789,
+    "enabled" : false // optional parameter, default = true
 }
 ```
 
@@ -99,13 +101,15 @@ Update all information about a user without changing id or username.
 
 **Permissions required** : Admin
 
-### Example request : `PUT /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider/opattern`
+### Example request
+`PUT /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider/opattern`
+
 ```json
 {
-    'displayname' : 'Oliver Puttern',
-    'email' : 'primeolli@pattern.biz', 
-    'quota' : 1234566666,
-    'enabled' : true // optional parameter, default = true
+    "displayname" : "Oliver Puttern",
+    "email" : "primeolli@pattern.biz", 
+    "quota" : 1234566666,
+    "enabled" : true // optional parameter, default = true
 }
 ```
 At the moment, all fields are modified together, no selective setting of fields implemented.
@@ -133,7 +137,8 @@ Remove an created or already logged in OpenID Connect user
 
 **Permissions required** : Admin
 
-### Example request : `DELETE /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider/opattern`
+### Example request
+`DELETE /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider/opattern`
 
 ### Success Responses
 **Code** : `200 OK`
@@ -159,14 +164,15 @@ with the given user as owner of the data.
 
 **Permissions required** : Admin
 
-### Example request : `GET /apps/nmcuser_oidc/api/1.0/token/testprovider/opattern`
+### Example request
+`GET /apps/nmcuser_oidc/api/1.0/token/testprovider/opattern`
 
 ### Success Responses
 **Code** : `200 OK` (user deleted)
 
 ```json
 {
-    'token' : '006678HGywq6785AG71...<NextCLoud device app token>',
+    "token" : "006678HGywq6785AG71...<NextCLoud device app token>",
 }
 ```
 
