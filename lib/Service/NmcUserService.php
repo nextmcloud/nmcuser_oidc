@@ -109,6 +109,7 @@ class NmcUserService {
         
         $oidcUser = $this->oidcUserMapper->getOrCreate($providerId, $username);
         $oidcUser->setDisplayName($displayname);
+        $this->oidcUserMapper->update($oidcUser);
         $user = $this->userManager->get($oidcUser->getUserId());
         $user->setEMailAddress($email);
         $user->setQuota($quota);
