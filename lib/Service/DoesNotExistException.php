@@ -1,4 +1,4 @@
 <?php
-namespace OCA\NextMagentaCloud\User\Service;
+namespace OCA\NextMagentaCloud\Service;
 
 class DoesNotExistException extends ServiceException {}

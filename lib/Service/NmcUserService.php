@@ -1,10 +1,9 @@
 <?php
-namespace OCA\NextMagentaCloud\User\Service;
+namespace OCA\NextMagentaCloud\Service;
 
 use Exception;
 
 use OCP\IUserManager;
-use OCP\IUser;
 use OCP\Security\ISecureRandom;
 use OC\Authentication\Token\IProvider;
 use OC\Authentication\Token\IToken;

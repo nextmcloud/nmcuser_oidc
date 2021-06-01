@@ -1,9 +1,9 @@
 <?php
-namespace OCA\NextMagentaCloud\User\Controller;
+namespace OCA\NextMagentaCloud\Controller;
 
 use Closure;
-use OCA\NextMagentaCloud\User\Service\NmcUserService;
-use OCA\NextMagentaCloud\User\Service\NotFoundException;
+use OCA\NextMagentaCloud\Service\NmcUserService;
+use OCA\NextMagentaCloud\Service\NotFoundException;
 use OCP\IRequest;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;

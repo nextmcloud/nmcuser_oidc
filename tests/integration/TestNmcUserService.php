@@ -21,11 +21,11 @@
  *
  */
 
-namespace OCA\NextMagentaCloud\User\Test\Service;
+namespace OCA\NextMagentaCloud\Test\Service;
 
 use Test\TestCase;
 
-use  OCA\NextMagentaCloud\User\Servic\NmcUserService;
+use  OCA\NextMagentaCloud\Service\NmcUserService;
 
 class NmcUserServiceTest extends TestCase {
 
