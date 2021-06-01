@@ -11,5 +11,5 @@ class Application extends App {
 	public function __construct (array $urlParams = []) {
 		parent::__construct(self::APP_NAME, $urlParams);
 	}
-	
+
 }

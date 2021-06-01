@@ -24,11 +24,12 @@ declare(strict_types=1);
  */
 
 return [
-	'resources' => [
-		'nmcuser' => ['url' => '/api/1.0/nmcusers/{$providername}']
-	],
 	'routes' => [
-		['name' => 'NmcUserApi#cors', 'url' => '/api/1.0/{path}', 'verb' => 'OPTIONS', 'requirements' => ['path' => '.+'] ],
-	    ['name' => 'NmcUserApi#token', 'url' => '/api/1.0//token/{$providername}/{$id}', 'verb' => 'GET'],
+		['name' => 'NmcUserApi#index', 'url' => '/api/1.0/nmcusers/{providername}', 'verb' => 'GET'],
+		['name' => 'NmcUserApi#show', 'url' => '/api/1.0/nmcusers/{providername}/{id}', 'verb' => 'GET'],
+		['name' => 'NmcUserApi#create', 'url' => '/api/1.0/nmcusers/{providername}', 'verb' => 'POST'],
+		['name' => 'NmcUserApi#update', 'url' => '/api/1.0/nmcusers/{providername}/{id}', 'verb' => 'PUT'],
+		['name' => 'NmcUserApi#destroy', 'url' => '/api/1.0/nmcusers/{providername}/{id}', 'verb' => 'DELETE'],
+		['name' => 'NmcUserApi#token', 'url' => '/api/1.0/token/{providername}/{id}', 'verb' => 'GET'],
 	]
 ];
