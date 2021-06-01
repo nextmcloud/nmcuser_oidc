@@ -76,13 +76,16 @@ class NmcUserService {
             $providerId = $this->findProviderByIdentifier($providername);
             $oidcUserId = $this->computeUserId($providerId, $username);
             $user = $this->userManager->get($oidcUserId);
+            if (is_null($user)) {
+                throw new NotFoundException("No user " . $username);
+            }
             return [
                 'id'          => $user->getUID(),
                 'displayname' => $user->getDisplayName(),
                 'email'       => $user->getEmailAddress(),
                 'quota'       => $user->getQuota(),
                 'enabled'     => $user->isEnabled(),
-            ];
+            ];    
         } catch(DoesNotExistException | MultipleObjectsReturnedException $eNotFound) {
             throw new NotFoundException($eNotFound->getMessage());
         } catch(Exception $e) {
