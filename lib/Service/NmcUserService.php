@@ -157,13 +157,14 @@ class NmcUserService {
     /**
      * Generate app token
      *
-     * @param string $providerid
+     * @param string $providername
      * @param string $username
      * @return string
      * @throws RuntimeException
      */
-    public function token(string $providerid, string $username) {
-        $oidcUserId = $this->computeUserId($providerid, $username);
+    public function token(string $providername, string $username) {
+		$providerId = $this->findProviderByIdentifier($providername);
+		$oidcUserId = $this->computeUserId($providerId, $username);
         $user = $this->userManager->get($oidcUserId);
 
         $token = $this->random->generate(72, ISecureRandom::CHAR_UPPER.ISecureRandom::CHAR_LOWER.ISecureRandom::CHAR_DIGITS);
