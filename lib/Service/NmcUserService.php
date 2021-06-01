@@ -46,12 +46,12 @@ class NmcUserService {
 
     /**
      * Find OpenId connect provider id case-insensitive by name.
-     * Otherwise, assume that the given parameter is already the id 
+     * Otherwise, assume that the given parameter is already the id
      */
     public function findProviderByIdentifier(string $providerNameOrId) {
         $providers = $this->oidcProviderMapper->getProviders();
         foreach ($providers as $provider) {
-            if (strcasecmp($provider->identifier, $providerNameOrId) == 0) {
+            if (strcasecmp($provider->getIdentifier(), $providerNameOrId) == 0) {
                 return $provider->id;
             }
         }
@@ -97,8 +97,8 @@ class NmcUserService {
 
     public function create(string $providername,
                         string $username,
-                        string $displayname, 
-                        string $email, 
+                        string $displayname,
+                        string $email,
                         int $quota,
                         bool $enabled = true) {
         $providerId = $this->findProviderByIdentifier($providername);
