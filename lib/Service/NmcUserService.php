@@ -102,7 +102,7 @@ class NmcUserService {
                         string $username,
                         string $displayname,
                         string $email,
-                        int $quota,
+                        string $quota,
                         bool $enabled = true) {
         $providerId = $this->findProviderByIdentifier($providername);
         $oidcUserId = $this->computeUserId($providerId, $username);
@@ -127,7 +127,7 @@ class NmcUserService {
                         string $username,
                         string $displayname, 
                         string $email, 
-                        int $quota,
+                        string $quota,
                         bool $enabled = true) {
         $providerId = $this->findProviderByIdentifier($providername);
         $oidcUserId = $this->computeUserId($providerId, $username);
