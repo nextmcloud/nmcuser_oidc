@@ -65,7 +65,7 @@ class NmcUserApiController extends ApiController {
 	 * @AdminRequired
 	 *
 	 * @param string $providername
-	 * @param string $username
+	 * @param string $id
 	 */
 	public function show($providername, $id) {
 		return $this->handleNotFound(function () use ($providername, $id) {
@@ -102,8 +102,8 @@ class NmcUserApiController extends ApiController {
 	 * @AdminRequired
 	 *
 	 * @param string $providername
-	 * @param string $username
-	 * @param string $displayName
+	 * @param string $id
+	 * @param string $displayname
 	 * @param string $email
 	 * @param string $quota
 	 * @param bool $enabled
@@ -125,7 +125,7 @@ class NmcUserApiController extends ApiController {
 	 * @AdminRequired
 	 *
 	 * @param string $providername
-	 * @param string $username
+	 * @param string $id
 	 */
 	public function destroy($providername, $id) {
 		return $this->handleNotFound(function () use ($providername, $id) {
@@ -139,7 +139,7 @@ class NmcUserApiController extends ApiController {
 	 * @AdminRequired
 	 *
 	 * @param string $providername
-	 * @param string $username
+	 * @param string $id
 	 */
 	public function token($providername, $id) {
 		return $this->handleNotFound(function () use ($providername, $id) {
