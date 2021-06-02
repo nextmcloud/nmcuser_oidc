@@ -46,7 +46,6 @@ class NmcUserService {
 
     /**
      * Find OpenId connect provider id case-insensitive by name.
-     * Otherwise, assume that the given parameter is already the id
      */
     public function findProviderByIdentifier(string $providerNameOrId) {
         $providers = $this->oidcProviderMapper->getProviders();
@@ -56,7 +55,7 @@ class NmcUserService {
             }
         }
 
-        return $providerNameOrId;
+        throw new NotFoundException("No oidc provider " . $providerNameOrId);
     }
 
     /**
@@ -71,13 +70,21 @@ class NmcUserService {
 		}
     }
 
+    /**
+     * Find openid user entries based on username in id system or
+     * by the generic hash id used by NextCloud user_oidc
+     * with priority to the username in OpenID system.
+     */
     public function find(string $providername, string $username) {
         try {
             $providerId = $this->findProviderByIdentifier($providername);
             $oidcUserId = $this->computeUserId($providerId, $username);
             $user = $this->userManager->get($oidcUserId);
-            if (is_null($user)) {
-                throw new NotFoundException("No user " . $username);
+            if ($user === null) {
+                $user = $this->userManager->get($username);
+            }
+            if ($user === null) {
+                throw new NotFoundException("No user " . $username . "id=" . $oidcUserId);
             }
             return [
                 'id'          => $user->getUID(),
@@ -88,14 +95,12 @@ class NmcUserService {
             ];    
         } catch(DoesNotExistException | MultipleObjectsReturnedException $eNotFound) {
             throw new NotFoundException($eNotFound->getMessage());
-        } catch(Exception $e) {
-            throw ($e);
-        }
+        } 
     }
 
-    public function findAll(string $providername, string $username) {
+    public function findAll(string $providername) {
         // TODO: implement multiple match (should this happen at all?)
-        return [ $this->find($providername, $username) ];
+        return [ ];
     }
 
     public function create(string $providername,

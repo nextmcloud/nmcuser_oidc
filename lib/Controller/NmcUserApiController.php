@@ -54,10 +54,9 @@ class NmcUserApiController extends ApiController {
 	 * @AdminRequired
 	 *
 	 * @param string $providername
-	 * @param string $username
 	 */
-	public function index($providername, $id) {
-		return new DataResponse($this->service->findAll($providername, $id));
+	public function index($providername) {
+		return new DataResponse($this->service->findAll($providername));
 	}
 
 	/**
