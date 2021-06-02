@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 return [
 	'routes' => [
+		['name' => 'NmcUserApi#preflighted_cors', 'url' => '/api/0.1/{path}','verb' => 'OPTIONS', 'requirements' => ['path' => '.+']],
 		['name' => 'NmcUserApi#index', 'url' => '/api/1.0/nmcusers/{providername}', 'verb' => 'GET'],
 		['name' => 'NmcUserApi#show', 'url' => '/api/1.0/nmcusers/{providername}/{id}', 'verb' => 'GET'],
 		['name' => 'NmcUserApi#create', 'url' => '/api/1.0/nmcusers/{providername}', 'verb' => 'POST'],
