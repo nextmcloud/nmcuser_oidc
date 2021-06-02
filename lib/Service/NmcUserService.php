@@ -47,15 +47,16 @@ class NmcUserService {
     /**
      * Find OpenId connect provider id case-insensitive by name.
      */
-    public function findProviderByIdentifier(string $providerNameOrId) {
+    public function findProviderByIdentifier(string $provider) {
         $providers = $this->oidcProviderMapper->getProviders();
-        foreach ($providers as $provider) {
-            if (strcasecmp($provider->getIdentifier(), $providerNameOrId) == 0) {
-                return $provider->id;
+        foreach ($providers as $p) {
+            if ((strcasecmp($p->getIdentifier(), $provider) == 0) ||
+                (strcmp($p->id, $provider) == 0 )) {
+                return $p->id;
             }
         }
 
-        throw new NotFoundException("No oidc provider " . $providerNameOrId);
+        throw new NotFoundException("No oidc provider " . $provider);
     }
 
     /**
@@ -74,18 +75,43 @@ class NmcUserService {
      * Find openid user entries based on username in id system or
      * by the generic hash id used by NextCloud user_oidc
      * with priority to the username in OpenID system.
+     *
+     * @return user object from manager
      */
-    public function find(string $providername, string $username) {
+    protected function findUser(string $provider, string $username) {
+        $providerId = $this->findProviderByIdentifier($provider);
+        $oidcUserId = $this->computeUserId($providerId, $username);
+        $user = $this->userManager->get($oidcUserId);
+        if ($user === null) {
+            $user = $this->userManager->get($username);
+        }
+        if ($user === null) {
+            throw new NotFoundException("No user " . $username . ", id=" . $oidcUserId);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Check for OpenId user existence
+    */
+    protected function userExists(string $provider, string $username) {
         try {
-            $providerId = $this->findProviderByIdentifier($providername);
-            $oidcUserId = $this->computeUserId($providerId, $username);
-            $user = $this->userManager->get($oidcUserId);
-            if ($user === null) {
-                $user = $this->userManager->get($username);
-            }
-            if ($user === null) {
-                throw new NotFoundException("No user " . $username . "id=" . $oidcUserId);
-            }
+            $user = $this->findUser($provider, $username);
+            return true;
+        } catch (NotFoundException $eNotFound) {
+            return false;
+        }    
+    }
+
+    /**
+     * Get openid user data based on username in id system or
+     * by the generic hash id used by NextCloud user_oidc
+     * with priority to the username in OpenID system.
+     */
+    public function find(string $provider, string $username) {
+        try {
+            $user = $this->findUser($provider, $username);
             return [
                 'id'          => $user->getUID(),
                 'displayname' => $user->getDisplayName(),
@@ -103,15 +129,14 @@ class NmcUserService {
         return [ ];
     }
 
-    public function create(string $providername,
+    public function create(string $provider,
                         string $username,
                         string $displayname,
                         string $email,
                         string $quota,
                         bool $enabled = true) {
-        $providerId = $this->findProviderByIdentifier($providername);
-        $oidcUserId = $this->computeUserId($providerId, $username);
-        if ($this->oidcUserMapper->userExists($oidcUserId)) {
+        $providerId = $this->findProviderByIdentifier($provider);
+        if ($this->userExists($providerId, $username)) {
             throw new UserExistException("OpenID user " . $username . "," . $oidcUserId . " already exists!");
         }
         
@@ -128,37 +153,30 @@ class NmcUserService {
         ];
     }
 
-    public function update(string $providername,
+    public function update(string $provider,
                         string $username,
                         string $displayname, 
                         string $email, 
                         string $quota,
                         bool $enabled = true) {
-        $providerId = $this->findProviderByIdentifier($providername);
-        $oidcUserId = $this->computeUserId($providerId, $username);
-        if (!$this->oidcUserMapper->userExists($oidcUserId)) {
-            throw new UserExistException("OpenID user " . $username . "," . $oidcUserId . " does not exist!");
-        }
-                            
-        $oidcUser = $this->oidcUserMapper->getOrCreate($providerId, $username);
-        $oidcUser->setDisplayName($displayname);
-        $user = $this->userManager->get($oidcUser->getUserId());
+        $providerId = $this->findProviderByIdentifier($provider);
+        $user = $this->findUser($provider, $username);
+
         $user->setEMailAddress($email);
         $user->setQuota($quota);
         $user->setEnabled($enabled);
+                            
+        $oidcUser = $this->oidcUserMapper->getOrCreate($providerId, $username);
+        $oidcUser->setDisplayName($displayname);
     }
 
-    public function delete(string $providername, string $username) {
+    public function delete(string $provider, string $username) {
         try {
-            $providerId = $this->findProviderByIdentifier($providername);
-            $oidcUserId = $this->computeUserId($providerId, $username);
-            $user = $this->userManager->get($oidcUserId);
+            $user = $this->findUser($provider, $username);
             $user->delete();
             // TODO: delete openid entry in app
         } catch(DoesNotExistException | MultipleObjectsReturnedException $eNotFound) {
             throw new NotFoundException($eNotFound->getMessage());
-        } catch(Exception $e) {
-            throw ($e);
         }
     }
 
@@ -170,10 +188,8 @@ class NmcUserService {
      * @return string
      * @throws RuntimeException
      */
-    public function token(string $providername, string $username) {
-		$providerId = $this->findProviderByIdentifier($providername);
-		$oidcUserId = $this->computeUserId($providerId, $username);
-        $user = $this->userManager->get($oidcUserId);
+    public function token(string $provider, string $username) {
+        $user = $this->findUser($provider, $username);
 
         $token = $this->random->generate(72, ISecureRandom::CHAR_UPPER.ISecureRandom::CHAR_LOWER.ISecureRandom::CHAR_DIGITS);
 		$this->tokenProvider->generateToken(

@@ -124,7 +124,7 @@ class NmcUserApiController extends ApiController {
 	 * @NoCSRFRequired
 	 * @AdminRequired
 	 *
-	 * @param int $providername
+	 * @param string $providername
 	 * @param string $username
 	 */
 	public function destroy($providername, $id) {
