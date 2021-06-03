@@ -4,6 +4,8 @@ namespace OCA\NextMagentaCloud\Service;
 use Exception;
 
 use OCP\IUserManager;
+use OCP\Accounts\IAccountManager;
+use OCP\Accounts\IAccount;
 use OCP\Security\ISecureRandom;
 use OC\Authentication\Token\IProvider;
 use OC\Authentication\Token\IToken;
@@ -20,6 +22,9 @@ class NmcUserService {
     /** @var IUserManager */
 	private $userManager;
 
+    /** @var IAccountManager */
+	private $accountManager;
+
     /** @var UserMapper */
 	private $oidcUserMapper;
 
@@ -33,11 +38,13 @@ class NmcUserService {
 	private $random;
 
     public function __construct(IUserManager $userManager,
+                            IAccountManager $accountManager,
                             UserMapper $oidcUserMapper,
                             ProviderMapper $oidcProviderMapper,
                             IProvider $tokenProvider,
                             ISecureRandom $random){
         $this->userManager = $userManager;
+        $this->accountManager = $accountManager;
         $this->oidcUserMapper = $oidcUserMapper;
         $this->oidcProviderMapper = $oidcProviderMapper;
         $this->tokenProvider = $tokenProvider;
@@ -112,20 +119,22 @@ class NmcUserService {
     public function find(string $provider, string $username) {
         try {
             $user = $this->findUser($provider, $username);
+            $userAccount = $this->accountManager->getAccount($user);
             return [
                 'id'          => $user->getUID(),
                 'displayname' => $user->getDisplayName(),
                 'email'       => $user->getEmailAddress(),
+                'altemail'    => $userAccount->getProperty(IAccountManager::PROPERTY_ADDRESS)->getValue(), // tmp location only
                 'quota'       => $user->getQuota(),
                 'enabled'     => $user->isEnabled(),
-            ];    
+            ];
         } catch(DoesNotExistException | MultipleObjectsReturnedException $eNotFound) {
             throw new NotFoundException($eNotFound->getMessage());
         } 
     }
 
     public function findAll(string $providername) {
-        // TODO: implement multiple match (should this happen at all?)
+        // TODO: implement lsiting users (should this happen at all?)
         return [ ];
     }
 
@@ -133,7 +142,8 @@ class NmcUserService {
                         string $username,
                         string $displayname,
                         string $email,
-                        string $quota,
+                        $altemail = null,
+                        string $quota = "3 GB",
                         bool $enabled = true) {
         $providerId = $this->findProviderByIdentifier($provider);
         if ($this->userExists($providerId, $username)) {
@@ -144,6 +154,14 @@ class NmcUserService {
         $oidcUser->setDisplayName($displayname);
         $this->oidcUserMapper->update($oidcUser);
         $user = $this->userManager->get($oidcUser->getUserId());
+
+        if ($altemail !== null) {
+            $userAccount = $this->accountManager->getAccount($user);
+            $userAccount->setProperty(IAccountManager::PROPERTY_ADDRESS, $altemail, 
+                                     IAccountManager::SCOPE_PRIVATE, IAccountManager::VERIFIED);
+            $this->accountManager->updateAccount($userAccount);
+        }
+
         $user->setEMailAddress($email);
         $user->setQuota($quota);
         $user->setEnabled($enabled);
@@ -157,10 +175,18 @@ class NmcUserService {
                         string $username,
                         $displayname = null, 
                         $email = null, 
+                        $altemail = null,
                         $quota = null,
                         bool $enabled = true) {
         $user = $this->findUser($provider, $username);
         $oidcUser = $this->oidcUserMapper->getUser($user->getUID());
+        $userAccount = $this->accountManager->getAccount($user);
+        
+        if ($altemail !== null) {
+            $userAccount->setProperty(IAccountManager::PROPERTY_ADDRESS, $altemail, 
+                                    IAccountManager::SCOPE_PRIVATE, IAccountManager::VERIFIED);
+            $this->accountManager->updateAccount($userAccount);
+        }
 
         if ($email !== null) {
             $user->setEMailAddress($email);
@@ -180,6 +206,7 @@ class NmcUserService {
             'id'          => $user->getUID(),
             'displayname' => $user->getDisplayName(),
             'email'       => $user->getEmailAddress(),
+            'altemail'    => $userAccount->getProperty(IAccountManager::PROPERTY_ADDRESS)->getValue(), // tmp location only
             'quota'       => $user->getQuota(),
             'enabled'     => $user->isEnabled(),
         ];  
