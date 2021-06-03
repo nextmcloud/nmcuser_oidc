@@ -90,7 +90,7 @@ class NmcUserApiController extends ApiController {
 						   string $username,
 						   string $displayname,
 						   string $email,
-						   string $quota,
+						   string $quota = "3GB",
 						   bool $enabled = true) {
 		return $this->handleAlreadyExists(function () use ($providername, $username, $displayname, $email, $quota, $enabled) {
 			return $this->service->create($providername, $username, $displayname, $email, $quota, $enabled);
@@ -104,16 +104,16 @@ class NmcUserApiController extends ApiController {
 	 *
 	 * @param string $providername
 	 * @param string $id
-	 * @param string $displayname
-	 * @param string $email
-	 * @param string $quota
+	 * @param string|null $displayname
+	 * @param string|null $email
+	 * @param string|null $quota
 	 * @param bool $enabled
 	 */
 	public function update(string $providername,
 						   string $id,
-						   string $displayname,
-						   string $email,
-						   string $quota,
+						   $displayname,
+						   $email,
+						   $quota,
 						   bool $enabled = true) {
 		return $this->handleNotFound(function () use ($providername, $id, $displayname, $email, $quota, $enabled) {
 			return $this->service->update($providername, $id, $displayname, $email, $quota, $enabled);

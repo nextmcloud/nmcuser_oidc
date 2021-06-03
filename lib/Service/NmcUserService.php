@@ -155,26 +155,40 @@ class NmcUserService {
 
     public function update(string $provider,
                         string $username,
-                        string $displayname, 
-                        string $email, 
-                        string $quota,
+                        $displayname = null, 
+                        $email = null, 
+                        $quota = null,
                         bool $enabled = true) {
-        $providerId = $this->findProviderByIdentifier($provider);
         $user = $this->findUser($provider, $username);
+        $oidcUser = $this->oidcUserMapper->getUser($user->getUID());
 
-        $user->setEMailAddress($email);
-        $user->setQuota($quota);
+        if ($email !== null) {
+            $user->setEMailAddress($email);
+        }
+        if ($quota !== null) {
+            $user->setQuota($quota);
+        }
         $user->setEnabled($enabled);
                             
-        $oidcUser = $this->oidcUserMapper->getOrCreate($providerId, $username);
-        $oidcUser->setDisplayName($displayname);
+        if ($displayname !== null) {
+            $oidcUser->setDisplayName($displayname);
+            $oidcUser->setDisplayName($displayname);
+            $this->oidcUserMapper->update($oidcUser);
+        }
+
+        return [
+            'id'          => $user->getUID(),
+            'displayname' => $user->getDisplayName(),
+            'email'       => $user->getEmailAddress(),
+            'quota'       => $user->getQuota(),
+            'enabled'     => $user->isEnabled(),
+        ];  
     }
 
     public function delete(string $provider, string $username) {
         try {
-            $providerId = $this->findProviderByIdentifier($provider);
             $user = $this->findUser($provider, $username);
-            $oidcUser = $this->oidcUserMapper->getOrCreate($providerId, $username);
+            $oidcUser = $this->oidcUserMapper->getUser($user->getUID());
 
             // TODO: add this to user_oidc mapper as delete method
             $this->oidcUserMapper->delete($oidcUser);
@@ -183,6 +197,8 @@ class NmcUserService {
         } catch(DoesNotExistException | MultipleObjectsReturnedException $eNotFound) {
             throw new NotFoundException($eNotFound->getMessage());
         }
+
+        return "";
     }
 
     /**
