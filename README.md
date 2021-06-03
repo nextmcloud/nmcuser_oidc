@@ -16,7 +16,7 @@ Notes:
 
 Create a new user with generic user_oidc username, email and quota.
 
-**URL** : `/apps/nmcuser_oidc/api/1.0/nmcusers/{providername}`
+**URL** : `/apps/nmcuser_oidc/api/1.1/nmcusers/{providername}`
 
 **Method** : `POST`
 
@@ -25,14 +25,15 @@ Create a new user with generic user_oidc username, email and quota.
 **Permissions required** : Admin
 
 ### Example request 
-`POST /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider`
+`POST /apps/nmcuser_oidc/api/1.1/nmcusers/testprovider`
 
 ```json
 {
     "username" : "'opattern",
     "displayname" : "Oliver Pattern",
     "email" : "primeolli@pattern.cloud", 
-    "quota" : 123456789,
+    "quota" : "25GB", // 3GB if not given, we don´t want to have unlimited quota
+    "altemail" : "secolli@pattern.cloud", // optional 
     "enabled" : false // optional parameter, default = true
 }
 ```
@@ -57,7 +58,7 @@ Create a new user with generic user_oidc username, email and quota.
 
 Get the details for an username or id.
 
-**URL** : `/apps/nmcuser_oidc/api/1.0/nmcusers/{providername}/{id}`
+**URL** : `/apps/nmcuser_oidc/api/1.1/nmcusers/{providername}/{id}`
 
 **Method** : `GET`
 
@@ -66,7 +67,7 @@ Get the details for an username or id.
 **Permissions required** : Admin
 
 ### Example request
-`GET /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider/opattern`
+`GET /apps/nmcuser_oidc/api/1.1/nmcusers/testprovider/opattern`
 
 ### Success Responses
 **Code** : `200 OK`
@@ -76,7 +77,8 @@ Get the details for an username or id.
     "id" : "0066786785671...<NextCLoud internal user hash>",
     "displayname" : "Oliver Pattern",
     "email" : "primeolli@pattern.cloud", 
-    "quota" : 123456789,
+    "quota" : "25GB",
+    "altemail" : "secolli@pattern.cloud", // optional 
     "enabled" : false // optional parameter, default = true
 }
 ```
@@ -93,7 +95,7 @@ Get the details for an username or id.
 
 Update all information about a user without changing id or username.
 
-**URL** : `/apps/nmcuser_oidc/api/1.0/nmcusers/{providername}/{id}`
+**URL** : `/apps/nmcuser_oidc/api/1.1/nmcusers/{providername}/{id}`
 
 **Method** : `PUT`
 
@@ -102,17 +104,18 @@ Update all information about a user without changing id or username.
 **Permissions required** : Admin
 
 ### Example request
-`PUT /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider/opattern`
+`PUT /apps/nmcuser_oidc/api/1.1/nmcusers/testprovider/opattern`
 
 ```json
 {
-    "displayname" : "Oliver Puttern",
+    "displayname" : "Oliver Puttern", // all optional
     "email" : "primeolli@pattern.biz", 
-    "quota" : 1234566666,
-    "enabled" : true // optional parameter, default = true
+    "quota" : "1TB",
+    "altemail" : "secolli@pattern.cloud",
+    "enabled" : true 
 }
 ```
-At the moment, all fields are modified together, no selective setting of fields implemented.
+You can selectively send any combination of fields.
 
 ### Success Responses
 **Code** : `200 OK`
@@ -129,7 +132,7 @@ At the moment, all fields are modified together, no selective setting of fields 
 
 Remove an created or already logged in OpenID Connect user
 
-**URL** : `/apps/nmcuser_oidc/api/1.0/nmcusers/{providername}/{id}`
+**URL** : `/apps/nmcuser_oidc/api/1.1/nmcusers/{providername}/{id}`
 
 **Method** : `DELETE`
 
@@ -138,7 +141,7 @@ Remove an created or already logged in OpenID Connect user
 **Permissions required** : Admin
 
 ### Example request
-`DELETE /apps/nmcuser_oidc/api/1.0/nmcusers/testprovider/opattern`
+`DELETE /apps/nmcuser_oidc/api/1.1/nmcusers/testprovider/opattern`
 
 ### Success Responses
 **Code** : `200 OK`
@@ -156,7 +159,7 @@ Remove an created or already logged in OpenID Connect user
 Get a token of the given user as admin. This is needed to put migrated data into the folder
 with the given user as owner of the data.
 
-**URL** : `/apps/nmcuser_oidc/api/1.0/token/{providername}/{id}`
+**URL** : `/apps/nmcuser_oidc/api/1.1/token/{providername}/{id}`
 
 **Method** : `GET`
 
@@ -165,7 +168,7 @@ with the given user as owner of the data.
 **Permissions required** : Admin
 
 ### Example request
-`GET /apps/nmcuser_oidc/api/1.0/token/testprovider/opattern`
+`GET /apps/nmcuser_oidc/api/1.1/token/testprovider/opattern`
 
 ### Success Responses
 **Code** : `200 OK` (user deleted)
