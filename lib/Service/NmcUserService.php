@@ -172,7 +172,12 @@ class NmcUserService {
 
     public function delete(string $provider, string $username) {
         try {
+            $providerId = $this->findProviderByIdentifier($provider);
             $user = $this->findUser($provider, $username);
+            $oidcUser = $this->oidcUserMapper->getOrCreate($providerId, $username);
+
+            // TODO: add this to user_oidc mapper as delete method
+            $this->oidcUserMapper->delete($oidcUser);
             $user->delete();
             // TODO: delete openid entry in app
         } catch(DoesNotExistException | MultipleObjectsReturnedException $eNotFound) {
