@@ -149,7 +149,7 @@ class NmcUserService {
         $user->setEnabled($enabled);
 
         return [
-          'id' => $oidcUserId
+          'id' => $oidcUser->getUserId()
         ];
     }
 

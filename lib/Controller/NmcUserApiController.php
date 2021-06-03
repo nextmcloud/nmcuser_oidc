@@ -4,6 +4,7 @@ namespace OCA\NextMagentaCloud\Controller;
 use Closure;
 use OCA\NextMagentaCloud\Service\NmcUserService;
 use OCA\NextMagentaCloud\Service\NotFoundException;
+use OCA\NextMagentaCloud\Service\UserExistException;
 use OCP\IRequest;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
