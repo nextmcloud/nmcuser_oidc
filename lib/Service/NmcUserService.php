@@ -243,8 +243,8 @@ class NmcUserService {
 		$this->tokenProvider->generateToken(
 			$token,
 			$user->getUID(),
-			$user->getDisplayName(),
-			'',
+			$user->getUID(),
+			null,
 			'cli',
 			IToken::PERMANENT_TOKEN,
 			IToken::DO_NOT_REMEMBER
