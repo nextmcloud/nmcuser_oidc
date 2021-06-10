@@ -4,6 +4,7 @@ namespace OCA\NextMagentaCloud\Service;
 use Exception;
 
 use OCP\IUserManager;
+use OCP\IDBConnection;
 use OCP\Accounts\IAccountManager;
 use OCP\Accounts\IAccount;
 use OCP\Security\ISecureRandom;
@@ -34,6 +35,9 @@ class NmcUserService {
     /** @var IProvider */
 	protected $tokenProvider;
 
+    /** @var IDBConnection */
+	private $db;
+
     /** @var ISecureRandom */
 	private $random;
 
@@ -42,12 +46,14 @@ class NmcUserService {
                             UserMapper $oidcUserMapper,
                             ProviderMapper $oidcProviderMapper,
                             IProvider $tokenProvider,
+                            IDBConnection $db,
                             ISecureRandom $random){
         $this->userManager = $userManager;
         $this->accountManager = $accountManager;
         $this->oidcUserMapper = $oidcUserMapper;
         $this->oidcProviderMapper = $oidcProviderMapper;
         $this->tokenProvider = $tokenProvider;
+        $this->db = $db;
         $this->random = $random;
     }
 
@@ -71,11 +77,17 @@ class NmcUserService {
      * id4me is not used/supported yet.
      */
     protected function computeUserId(string $providerId, string $username, bool $id4me = false) {
-		if ($id4me) {
-			return hash('sha256', $providerId . '_1_' . $username);
+		// old way with hashed names only:
+        //if ($id4me) {
+		//	return hash('sha256', $providerId . '_1_' . $username);
+		//} else {
+		//	return hash('sha256', $providerId . '_0_' . $username);
+		//}
+        if (strlen($username) > 64) {
+			return hash('sha256', $username);
 		} else {
-			return hash('sha256', $providerId . '_0_' . $username);
-		}
+            return $username;
+        }
     }
 
     /**
@@ -133,9 +145,32 @@ class NmcUserService {
         } 
     }
 
-    public function findAll(string $providername) {
-        // TODO: implement lsiting users (should this happen at all?)
-        return [ ];
+    /**
+     * This method only delivers ids/usernames of OpenID connect users 
+     */
+    public function findAll(string $providername, ?int $limit = null, ?int $offset = null) {
+        $qb = $this->db->getQueryBuilder();
+		$qb
+			->select('*')
+			->from($this->oidcUserMapper->getTableName());
+
+		if ($limit !== null) {
+			$qb->setMaxResults($limit);
+		}
+		if ($offset !== null) {
+			$qb->setFirstResult($offset);
+		}
+
+		return $this->oidcUserMapper->findEntities($qb);
+    }
+
+    protected function createDbUser(string $providerId, string $username) {
+		// old way with hashed names only:
+        // return $this->oidcUserMapper->getOrCreate($providerId, $username);
+        $userId = $this->computeUserId($username);
+        $user = new User();
+		$user->setUserId($userId);
+        return $this->oidcUserMapper->insert($user);
     }
 
     public function create(string $provider,
@@ -150,7 +185,7 @@ class NmcUserService {
             throw new UserExistException("OpenID user " . $username . "," . $oidcUserId . " already exists!");
         }
         
-        $oidcUser = $this->oidcUserMapper->getOrCreate($providerId, $username);
+        $oidcUser = $this->createDbUser($providerId, $username);
         $oidcUser->setDisplayName($displayname);
         $this->oidcUserMapper->update($oidcUser);
         $user = $this->userManager->get($oidcUser->getUserId());
@@ -158,7 +193,7 @@ class NmcUserService {
         if ($altemail !== null) {
             $userAccount = $this->accountManager->getAccount($user);
             $userAccount->setProperty(IAccountManager::PROPERTY_ADDRESS, $altemail, 
-                                     IAccountManager::SCOPE_PRIVATE, IAccountManager::VERIFIED);
+                                      IAccountManager::SCOPE_PRIVATE, IAccountManager::VERIFIED);
             $this->accountManager->updateAccount($userAccount);
         }
 

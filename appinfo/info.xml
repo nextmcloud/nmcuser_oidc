@@ -5,7 +5,7 @@
 	<name>NextMagentaCloud OpenID Connect user management util</name>
 	<summary>Utility app for NextMagentaCloud to create OpenID connect users</summary>
 	<description>This utility app supports NextMagentaCloud migration to create OpenID users with file content before actual first login.</description>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<licence>agpl</licence>
 	<author>Bernd Rederlechner</author>
 	<namespace>NextMagentaCloud</namespace>
