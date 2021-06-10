@@ -84,7 +84,7 @@ class NmcUserApiController extends ApiController {
 	 * @param string $providername
 	 * @param string $username
 	 * @param string $displayname
-	 * @param string $email
+	 * @param string|null $email
 	 * @param string|null $altemail
 	 * @param string $quota
 	 * @param bool $enabled
@@ -92,7 +92,7 @@ class NmcUserApiController extends ApiController {
 	public function create(string $providername,
 						   string $username,
 						   string $displayname,
-						   string $email,
+						   $email = null,
 						   $altemail = null,
 						   string $quota = "3GB",
 						   bool $enabled = true) {

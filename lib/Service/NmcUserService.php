@@ -167,7 +167,7 @@ class NmcUserService {
     protected function createDbUser(string $providerId, string $username) {
 		// old way with hashed names only:
         // return $this->oidcUserMapper->getOrCreate($providerId, $username);
-        $userId = $this->computeUserId($username);
+        $userId = $this->computeUserId($providerId, $username);
         $user = new User();
 		$user->setUserId($userId);
         return $this->oidcUserMapper->insert($user);
@@ -176,7 +176,7 @@ class NmcUserService {
     public function create(string $provider,
                         string $username,
                         string $displayname,
-                        string $email,
+                        $email = null,
                         $altemail = null,
                         string $quota = "3 GB",
                         bool $enabled = true) {
@@ -197,7 +197,10 @@ class NmcUserService {
             $this->accountManager->updateAccount($userAccount);
         }
 
-        $user->setEMailAddress($email);
+        if ($email !== null) {
+            $user->setEMailAddress($email);
+        }
+
         $user->setQuota($quota);
         $user->setEnabled($enabled);
 
