@@ -6,7 +6,7 @@ tail -f /var/log/nextcloud/nextcloud.json.log |jq 'select(.user=="apitest")'
 # Some example tests with curl:
 - GET, user not found:
 ```
-curl -i -u apitest:qLagUm0DByDydvL0Svnu -X GET https://dev2.next.magentacloud.de/apps/nmcuser_oidc/api/1.1/nmcusers/telekom/12345
+curl -i -u apitest:qL***u -X GET https://dev2.next.magentacloud.de/apps/nmcuser_oidc/api/1.1/nmcusers/telekom/12345
 ```
 
 - GET, provider not found:
@@ -31,8 +31,14 @@ curl -i -u apitest:qLagUm0DByDydvL0Svnu  -X GET https://dev2.next.magentacloud.d
 
 - GET list, offset
 ```
-curl -i -u apitest:qLagUm0DByDydvL0Svnu  -X GET https://dev2.next.magentacloud.de/apps/nmcuser_oidc/api/1.1/nmcusers/telekom/?limit=1
+curl -i -u apitest:qLagUm0DByDydvL0Svnu  -X GET https://dev2.next.magentacloud.de/apps/nmcuser_oidc/api/1.1/nmcusers/telekom?offset=1
 ```
+
+- GET list, offset, limit
+```
+curl -i -u apitest:qLagUm0DByDydvL0Svnu  -X GET https://dev2.next.magentacloud.de/apps/nmcuser_oidc/api/1.1/nmcusers/telekom?offset=1&limit=3
+```
+
 
 - CREATE, with known anid/username, no email:
 ```
@@ -42,7 +48,7 @@ On second call, there should be a `409 CONFLICT` because user already exists
 
 - CREATE, with known anid/username, no quota, email, altemail:
 ```
-curl -i -u apitest:qLagUm0DByDydvL0Svnu  -X POST -H "Content-Type: application/json" -H "Accept: application/json" --data-raw '{"username": "120049010000000006612061", "displayname": "User, Test", "email": "nmcloud02@ver.sul.t-online.de", "altemail": "fool@fool.cloud"}' https://dev2.next.magentacloud.de/apps/nmcuser_oidc/api/1.1/nmcusers/telekom 
+curl -i -u apitest:qLagUm0DByDydvL0Svnu  -X POST -H "Content-Type: application/json" -H "Accept: application/json" --data-raw '{"username": "120049010000000006613061", "displayname": "User, Test", "email": "nmcloud03@ver.sul.t-online.de", "altemail": "fool@fool.cloud"}' https://dev2.next.magentacloud.de/apps/nmcuser_oidc/api/1.1/nmcusers/telekom 
 ```
 
 
@@ -59,7 +65,7 @@ curl -i -u apitest:qLagUm0DByDydvL0Svnu  -X PUT -H "Content-Type: application/js
 
 - PUT update, anid/username key, account changes on quota only
 ```
-curl -i -u apitest:qLagUm0DByDydvL0Svnu  -X PUT -H "Content-Type: application/json" -H "Accept: application/json" --data-raw '{ "quota": "1 TB" }' https://dev2.next.magentacloud.de/apps/nmcuser_oidc/api/1.1/nmcusers/telekom/120049010000000006612061 
+curl -i -u apitest:qLagUm0DByDydvL0Svnu  -X PUT -H "Content-Type: application/json" -H "Accept: application/json" --data-raw '{ "quota": "1TB" }' https://dev2.next.magentacloud.de/apps/nmcuser_oidc/api/1.1/nmcusers/telekom/120049010000000006612061 
 ```
 
 - PUT update, anid/username key, changes on displayname, email and altemail only
