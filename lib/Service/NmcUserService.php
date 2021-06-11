@@ -15,6 +15,14 @@ use OCA\UserOIDC\Db\UserMapper;
 use OCA\UserOIDC\Db\User;
 use OCA\UserOIDC\Db\ProviderMapper;
 use OCA\UserOIDC\Db\Provider;
+
+use OCP\AppFramework\Db\DoesNotExistException;
+use OCP\AppFramework\Db\MultipleObjectsReturnedException;
+
+use OCA\NextMagentaCloud\Service\NotFoundException;
+use OCA\NextMagentaCloud\Service\UserExistException;
+
+
 use RuntimeException;
 
 class NmcUserService {
@@ -143,8 +151,10 @@ class NmcUserService {
      * This method only delivers ids/usernames of OpenID connect users 
      */
     public function findAll(string $provider, ?int $limit = null, ?int $offset = null) {
-        $providerId = $this->findProviderByIdentifier($provider);
-        $users = $this->oidcUserMapper->find("", $limit, $offset);
+        //$providerId = $this->findProviderByIdentifier($provider);
+        //$users = $this->oidcUserMapper->find("", $limit, $offset);
+        
+        $users = $this->userManager->search("", $limit, $offset);
         return $users;
     }
 
@@ -246,8 +256,8 @@ class NmcUserService {
             $oidcUser = $this->oidcUserMapper->getUser($user->getUID());
 
             // TODO: add this to user_oidc mapper as delete method
-            $this->oidcUserMapper->delete($oidcUser);
             $user->delete();
+            $this->oidcUserMapper->delete($oidcUser);
             // TODO: delete openid entry in app
         } catch(DoesNotExistException | MultipleObjectsReturnedException $eNotFound) {
             throw new NotFoundException($eNotFound->getMessage());
