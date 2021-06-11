@@ -4,7 +4,6 @@ namespace OCA\NextMagentaCloud\Service;
 use Exception;
 
 use OCP\IUserManager;
-use OCP\IDBConnection;
 use OCP\Accounts\IAccountManager;
 use OCP\Accounts\IAccount;
 use OCP\Security\ISecureRandom;
@@ -35,9 +34,6 @@ class NmcUserService {
     /** @var IProvider */
 	protected $tokenProvider;
 
-    /** @var IDBConnection */
-	private $db;
-
     /** @var ISecureRandom */
 	private $random;
 
@@ -46,14 +42,12 @@ class NmcUserService {
                             UserMapper $oidcUserMapper,
                             ProviderMapper $oidcProviderMapper,
                             IProvider $tokenProvider,
-                            IDBConnection $db,
                             ISecureRandom $random){
         $this->userManager = $userManager;
         $this->accountManager = $accountManager;
         $this->oidcUserMapper = $oidcUserMapper;
         $this->oidcProviderMapper = $oidcProviderMapper;
         $this->tokenProvider = $tokenProvider;
-        $this->db = $db;
         $this->random = $random;
     }
 
@@ -148,22 +142,15 @@ class NmcUserService {
     /**
      * This method only delivers ids/usernames of OpenID connect users 
      */
-    public function findAll(string $providername, ?int $limit = null, ?int $offset = null) {
-        $qb = $this->db->getQueryBuilder();
-		$qb
-			->select('*')
-			->from($this->oidcUserMapper->getTableName());
-
-		if ($limit !== null) {
-			$qb->setMaxResults($limit);
-		}
-		if ($offset !== null) {
-			$qb->setFirstResult($offset);
-		}
-
-		return $this->oidcUserMapper->findEntities($qb);
+    public function findAll(string $provider, ?int $limit = null, ?int $offset = null) {
+        $providerId = $this->findProviderByIdentifier($provider);
+        $users = $this->oidcUserMapper->find("", $limit, $offset);
+        return $users;
     }
 
+    /**
+     * Encapsulation  
+     */
     protected function createDbUser(string $providerId, string $username) {
 		// old way with hashed names only:
         // return $this->oidcUserMapper->getOrCreate($providerId, $username);
@@ -173,6 +160,9 @@ class NmcUserService {
         return $this->oidcUserMapper->insert($user);
     }
 
+    /**
+     * Create a compliant user for 
+     */
     public function create(string $provider,
                         string $username,
                         string $displayname,
