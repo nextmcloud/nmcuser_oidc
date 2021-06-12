@@ -150,12 +150,19 @@ class NmcUserService {
     /**
      * This method only delivers ids/usernames of OpenID connect users 
      */
-    public function findAll(string $provider, ?int $limit = null, ?int $offset = null) {
-        //$providerId = $this->findProviderByIdentifier($provider);
+    public function findAll(string $provider, string $pattern = null, ?int $limit = null, ?int $offset = null) {
+        // $providerId = $this->findProviderByIdentifier($provider);
         //$users = $this->oidcUserMapper->find("", $limit, $offset);
+
+        if ($pattern === null ) {
+            $users = $this->userManager->search("", $limit, $offset);
+        } else {
+            $users = $this->userManager->search($pattern, $limit, $offset);
+        }
         
-        $users = $this->userManager->search("", $limit, $offset);
-        return $users;
+        return array_keys(array_filter($users, function ($user) {
+            return ((strlen($user) == 24) && is_numeric($user)) ? true : false;
+        }, ARRAY_FILTER_USE_KEY));
     }
 
     /**
