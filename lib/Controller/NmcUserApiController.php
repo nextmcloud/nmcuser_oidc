@@ -5,6 +5,7 @@ use Closure;
 use OCA\NextMagentaCloud\Service\NmcUserService;
 use OCA\NextMagentaCloud\Service\NotFoundException;
 use OCA\NextMagentaCloud\Service\UserExistException;
+use OCA\NextMagentaCloud\Service\ForbiddenException;
 use OCP\IRequest;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
@@ -46,6 +47,9 @@ class NmcUserApiController extends ApiController {
 		} catch (UserExistException $e) {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_CONFLICT);
+		} catch  (ForbiddenException $eForbidden) {
+			$message = ['message' => $eForbidden->getMessage()];
+			return new DataResponse($message, Http::STATUS_FORBIDDEN);		
 		}
 	}
 

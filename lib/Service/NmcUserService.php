@@ -4,11 +4,15 @@ namespace OCA\NextMagentaCloud\Service;
 use Exception;
 
 use OCP\IUserManager;
+use OCP\IServerContainer;
+use OCP\Util;
 use OCP\Accounts\IAccountManager;
 use OCP\Accounts\IAccount;
 use OCP\Security\ISecureRandom;
 use OC\Authentication\Token\IProvider;
 use OC\Authentication\Token\IToken;
+
+use OCP\Files\NotPermittedException;
 
 // classes from user_oidc app
 use OCA\UserOIDC\Db\UserMapper;
@@ -21,6 +25,7 @@ use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
 use OCA\NextMagentaCloud\Service\NotFoundException;
 use OCA\NextMagentaCloud\Service\UserExistException;
+use OCA\NextMagentaCloud\Service\ForbiddenException;
 
 
 use RuntimeException;
@@ -32,6 +37,9 @@ class NmcUserService {
 
     /** @var IAccountManager */
 	private $accountManager;
+
+    /** @var IServerContainer */
+	private $serverc;
 
     /** @var UserMapper */
 	private $oidcUserMapper;
@@ -47,12 +55,14 @@ class NmcUserService {
 
     public function __construct(IUserManager $userManager,
                             IAccountManager $accountManager,
+                            IServerContainer $serverContainer,
                             UserMapper $oidcUserMapper,
                             ProviderMapper $oidcProviderMapper,
                             IProvider $tokenProvider,
                             ISecureRandom $random){
         $this->userManager = $userManager;
         $this->accountManager = $accountManager;
+        $this->serverc = $serverContainer;
         $this->oidcUserMapper = $oidcUserMapper;
         $this->oidcProviderMapper = $oidcProviderMapper;
         $this->tokenProvider = $tokenProvider;
@@ -210,6 +220,14 @@ class NmcUserService {
 
         $user->setQuota($quota);
         $user->setEnabled($enabled);
+
+        $userFolder = $this->serverc->getUserFolder($user->getUID());
+        try {
+            // copy skeleton
+            \OC_Util::copySkeleton($user->getUID(), $userFolder);
+        } catch (NotPermittedException $ex) {
+            throw new ForbiddenException("Newly created user cannot init home folder. Reason:\n" . $ex.getMessage() );
+        }
 
         return [
           'id' => $oidcUser->getUserId()
