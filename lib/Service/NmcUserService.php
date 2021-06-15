@@ -221,11 +221,14 @@ class NmcUserService {
         $user->setQuota($quota);
         $user->setEnabled($enabled);
 
-        $userFolder = $this->serverc->getUserFolder($user->getUID());
         try {
+            $userFolder = $this->serverc->getUserFolder($user->getUID());
+            \OC::$server->getLogger()->debug('nmcuser_oidc: User folder created "' . $user->getUID() . '", exists=' . ($this->serverc->getRootFolder()->nodeExists('/' . $user->getUID() . '/files') ? 'true' : 'false'), ['app' => 'debug_create']);
+
             // copy skeleton
             \OC_Util::copySkeleton($user->getUID(), $userFolder);
         } catch (NotPermittedException $ex) {
+            \OC::$server->getLogger()->logException($ex, ['app' => 'nmcuser_oidc']);
             throw new ForbiddenException("Newly created user cannot init home folder. Reason:\n" . $ex.getMessage() );
         }
 
