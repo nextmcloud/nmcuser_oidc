@@ -225,6 +225,11 @@ class NmcUserService {
             $userFolder = $this->serverc->getUserFolder($user->getUID());
             \OC::$server->getLogger()->debug('nmcuser_oidc: User folder created "' . $user->getUID() . '", exists=' . ($this->serverc->getRootFolder()->nodeExists('/' . $user->getUID() . '/files') ? 'true' : 'false'), ['app' => 'debug_create']);
 
+            // Write a temporary file to the user home to make sure it is properly setup
+			// FIXME: Remove once the issue with the missing user directory on concurrent webdav requests are sorted out
+            $file = $userFolder->newFile('.userCreateTemp');
+            $file->delete();
+
             // copy skeleton
             \OC_Util::copySkeleton($user->getUID(), $userFolder);
         } catch (NotPermittedException $ex) {
