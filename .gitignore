@@ -1,0 +1,8 @@
+.idea
+*.iml
+/js
+/vendor/
+/build/
+node_modules/
+/.php_cs.cache
+/lib/Vendor
