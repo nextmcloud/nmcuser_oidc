@@ -125,7 +125,7 @@ class NmcUserService {
 
     /**
      * Check for OpenId user existence
-    */
+     */
     protected function userExists(string $provider, string $username) {
         try {
             $user = $this->findUser($provider, $username);
@@ -161,7 +161,7 @@ class NmcUserService {
      * This method only delivers ids/usernames of OpenID connect users 
      */
     public function findAll(string $provider, string $pattern = null, ?int $limit = null, ?int $offset = null) {
-        // $providerId = $this->findProviderByIdentifier($provider);
+        $providerId = $this->findProviderByIdentifier($provider); // check provider although it is not further used later
         //$users = $this->oidcUserMapper->find("", $limit, $offset);
 
         if ($pattern === null ) {
