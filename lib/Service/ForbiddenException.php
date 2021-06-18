@@ -1,4 +1,6 @@
 <?php
+
 namespace OCA\NextMagentaCloud\Service;
 
-class ForbiddenException extends ServiceException {}
+class ForbiddenException extends ServiceException {
+}

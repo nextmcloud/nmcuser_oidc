@@ -1,4 +1,6 @@
 <?php
+
 namespace OCA\NextMagentaCloud\Service;
 
-class NotFoundException extends ServiceException {}
+class NotFoundException extends ServiceException {
+}

@@ -35,8 +35,7 @@ class NmcUserServiceTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-        $this->userService = new NmcUserService();
-
+		$this->userService = new NmcUserService();
 	}
 
 	public function testOidcUser() {

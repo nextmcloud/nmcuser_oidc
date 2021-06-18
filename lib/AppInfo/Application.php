@@ -5,11 +5,9 @@ namespace OCA\NextMagentaCloud\AppInfo;
 use OCP\AppFramework\App;
 
 class Application extends App {
+	public const APP_NAME = 'nmcuser_oidc';
 
-	const APP_NAME = 'nmcuser_oidc';
-
-	public function __construct (array $urlParams = []) {
+	public function __construct(array $urlParams = []) {
 		parent::__construct(self::APP_NAME, $urlParams);
 	}
-
 }

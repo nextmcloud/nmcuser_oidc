@@ -1,4 +1,6 @@
 <?php
+
 namespace OCA\NextMagentaCloud\Service;
 
-class MultipleObjectsReturnedException extends ServiceException {}
+class MultipleObjectsReturnedException extends ServiceException {
+}

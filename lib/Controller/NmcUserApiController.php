@@ -1,4 +1,5 @@
 <?php
+
 namespace OCA\NextMagentaCloud\Controller;
 
 use Closure;
@@ -11,10 +12,7 @@ use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\ApiController;
 
-
-
 class NmcUserApiController extends ApiController {
-
 	private $service;
 
 	public function __construct($appName,
@@ -47,9 +45,9 @@ class NmcUserApiController extends ApiController {
 		} catch (UserExistException $e) {
 			$message = ['message' => $e->getMessage()];
 			return new DataResponse($message, Http::STATUS_CONFLICT);
-		} catch  (ForbiddenException $eForbidden) {
+		} catch (ForbiddenException $eForbidden) {
 			$message = ['message' => $eForbidden->getMessage()];
-			return new DataResponse($message, Http::STATUS_FORBIDDEN);		
+			return new DataResponse($message, Http::STATUS_FORBIDDEN);
 		}
 	}
 
