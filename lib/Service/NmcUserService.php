@@ -228,7 +228,7 @@ class NmcUserService {
 			\OC_Util::copySkeleton($user->getUID(), $userFolder);
 		} catch (NotPermittedException $ex) {
 			\OC::$server->getLogger()->logException($ex, ['app' => 'nmcuser_oidc']);
-			throw new ForbiddenException("Newly created user cannot init home folder. Reason:\n" . $ex.getMessage());
+			throw new ForbiddenException("Newly created user cannot init home folder. Reason:\n" . $ex->getMessage());
 		}
 
 		return [
