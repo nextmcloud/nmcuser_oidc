@@ -91,6 +91,7 @@ class NmcUserApiController extends ApiController {
 	 * @param string|null $email
 	 * @param string|null $altemail
 	 * @param string $quota
+	 * @param bool $migrated
 	 * @param bool $enabled
 	 */
 	public function create(string $providername,
@@ -99,9 +100,10 @@ class NmcUserApiController extends ApiController {
 						   $email = null,
 						   $altemail = null,
 						   string $quota = "3GB",
+						   bool $migrated = true,
 						   bool $enabled = true) {
-		return $this->handleAlreadyExists(function () use ($providername, $username, $displayname, $email, $altemail, $quota, $enabled) {
-			return $this->service->create($providername, $username, $displayname, $email,  $altemail, $quota, $enabled);
+		return $this->handleAlreadyExists(function () use ($providername, $username, $displayname, $email, $altemail, $quota, $migrated, $enabled) {
+			return $this->service->create($providername, $username, $displayname, $email,  $altemail, $quota, $migrated, $enabled);
 		});
 	}
 
@@ -116,7 +118,8 @@ class NmcUserApiController extends ApiController {
 	 * @param string|null $email
 	 * @param string|null $altemail
 	 * @param string|null $quota
-	 * @param bool $enabled
+	 * @param bool|null $migrated
+	 * @param bool|null $enabled
 	 */
 	public function update(string $providername,
 						   string $id,
@@ -124,9 +127,10 @@ class NmcUserApiController extends ApiController {
 						   $email,
 						   $altemail,
 						   $quota,
+						   $migrated,
 						   bool $enabled = true) {
-		return $this->handleNotFound(function () use ($providername, $id, $displayname, $email, $altemail, $quota, $enabled) {
-			return $this->service->update($providername, $id, $displayname, $email, $altemail, $quota, $enabled);
+		return $this->handleNotFound(function () use ($providername, $id, $displayname, $email, $altemail, $quota, $migrated, $enabled) {
+			return $this->service->update($providername, $id, $displayname, $email, $altemail, $quota, $migrated, $enabled);
 		});
 	}
 

@@ -79,6 +79,7 @@ Get the details for an username or id.
     "email" : "primeolli@pattern.cloud", 
     "quota" : "25GB",
     "altemail" : "secolli@pattern.cloud", // optional 
+    "migrated" : false, // optional parameter, default = true
     "enabled" : false // optional parameter, default = true
 }
 ```
@@ -112,10 +113,13 @@ Update all information about a user without changing id or username.
     "email" : "primeolli@pattern.biz", 
     "quota" : "1TB",
     "altemail" : "secolli@pattern.cloud",
-    "enabled" : true 
+    "migrated" : false, 
+    "enabled" : true
 }
 ```
-You can selectively send any combination of fields.
+You can selectively send any combination of fields, except 'enabled'.
+If you want to keep a disabled user disabled, you have to explicitly set ''enabled': false'
+again.
 
 ### Success Responses
 **Code** : `200 OK`

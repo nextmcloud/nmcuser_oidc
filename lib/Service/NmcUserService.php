@@ -2,6 +2,7 @@
 
 namespace OCA\NextMagentaCloud\Service;
 
+use OCP\IConfig;
 use OCP\IUserManager;
 use OCP\IServerContainer;
 use OCP\Accounts\IAccountManager;
@@ -20,7 +21,7 @@ use OCA\UserOIDC\Db\Provider;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 
-
+use OCA\NextMagentaCloud\AppInfo\Application;
 
 use RuntimeException;
 
@@ -34,6 +35,9 @@ class NmcUserService {
 
 	/** @var IServerContainer */
 	private $serverc;
+
+	/** @var IConfig */
+	private $config;
 
 	/** @var UserMapper */
 	private $oidcUserMapper;
@@ -50,6 +54,7 @@ class NmcUserService {
 	public function __construct(IUserManager $userManager,
 							IAccountManager $accountManager,
 							IServerContainer $serverContainer,
+							IConfig $config,
 							UserMapper $oidcUserMapper,
 							ProviderMapper $oidcProviderMapper,
 							IProvider $tokenProvider,
@@ -57,6 +62,7 @@ class NmcUserService {
 		$this->userManager = $userManager;
 		$this->accountManager = $accountManager;
 		$this->serverc = $serverContainer;
+		$this->config = $config;
 		$this->oidcUserMapper = $oidcUserMapper;
 		$this->oidcProviderMapper = $oidcProviderMapper;
 		$this->tokenProvider = $tokenProvider;
@@ -130,6 +136,20 @@ class NmcUserService {
 	}
 
 	/**
+	 *  Set migration flag to user settings $user->getUID()
+	 */
+	protected function setMigrationFlag($userId, bool $flag) {
+		$this->config->setUserValue($userId, Application::APP_NAME, 'migrated', $flag ? 1 : 0 );
+	}
+
+	/**
+	 *  get migration flag to user settings
+	 */
+	protected function getMigrationFlag($userId) {
+		return $this->config->getUserValue($userId, Application::APP_NAME, 'migrated', 0) == 1 ? true : false ;
+	}
+
+	/**
 	 * Get openid user data based on username in id system or
 	 * by the generic hash id used by NextCloud user_oidc
 	 * with priority to the username in OpenID system.
@@ -145,6 +165,7 @@ class NmcUserService {
 				'altemail' => $userAccount->getProperty(IAccountManager::PROPERTY_ADDRESS)->getValue(), // tmp location only
 				'quota' => $user->getQuota(),
 				'enabled' => $user->isEnabled(),
+				'migrated' => $this->getMigrationFlag($user->getUID())
 			];
 		} catch (DoesNotExistException | MultipleObjectsReturnedException $eNotFound) {
 			throw new NotFoundException($eNotFound->getMessage());
@@ -181,6 +202,7 @@ class NmcUserService {
 		return $this->oidcUserMapper->insert($user);
 	}
 
+
 	/**
 	 * Create a compliant user for
 	 */
@@ -190,10 +212,11 @@ class NmcUserService {
 						$email = null,
 						$altemail = null,
 						string $quota = "3 GB",
+						bool $migrated = true,
 						bool $enabled = true) {
 		$providerId = $this->findProviderByIdentifier($provider);
 		if ($this->userExists($providerId, $username)) {
-			throw new UserExistException("OpenID user " . $username . "," . $oidcUserId . " already exists!");
+			throw new UserExistException("OpenID user " . $provider . ":" . $username . " already exists!");
 		}
 		
 		$oidcUser = $this->createDbUser($providerId, $username);
@@ -214,6 +237,7 @@ class NmcUserService {
 
 		$user->setQuota($quota);
 		$user->setEnabled($enabled);
+		$this->setMigrationFlag($user->getUID(), $migrated);
 
 		try {
 			$userFolder = $this->serverc->getUserFolder($user->getUID());
@@ -242,7 +266,8 @@ class NmcUserService {
 						$email = null,
 						$altemail = null,
 						$quota = null,
-						bool $enabled = true) {
+						$migrated = null,
+						bool $enabled = null) {
 		$user = $this->findUser($provider, $username);
 		$oidcUser = $this->oidcUserMapper->getUser($user->getUID());
 		$userAccount = $this->accountManager->getAccount($user);
@@ -259,10 +284,13 @@ class NmcUserService {
 		if ($quota !== null) {
 			$user->setQuota($quota);
 		}
-		$user->setEnabled($enabled);
-							
+		if ($migrated !== null) {
+			$this->setMigrationFlag($user->getUID(), $migrated);
+		}
+		if ($enabled !== null) {
+			$user->setEnabled($enabled);
+		}							
 		if ($displayname !== null) {
-			$oidcUser->setDisplayName($displayname);
 			$oidcUser->setDisplayName($displayname);
 			$this->oidcUserMapper->update($oidcUser);
 		}
@@ -274,6 +302,7 @@ class NmcUserService {
 			'altemail' => $userAccount->getProperty(IAccountManager::PROPERTY_ADDRESS)->getValue(), // tmp location only
 			'quota' => $user->getQuota(),
 			'enabled' => $user->isEnabled(),
+			'migrated' => $this->getMigrationFlag($user->getUID())
 		];
 	}
 
